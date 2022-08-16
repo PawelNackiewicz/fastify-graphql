@@ -1,0 +1,27 @@
+{
+  "name": "graphql",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/accepts": "^4.0.0",
+    "@fastify/cors": "^8.1.0",
+    "apollo-server": "^3.10.1",
+    "concurrently": "^7.3.0",
+    "fastify": "^4.4.0",
+    "graphql": "^16.5.0",
+    "module_name": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.4",
+    "fastify-tsconfig": "^1.0.1",
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail 'yarn dev:db' 'yarn dev:ts-node'",
+    "dev:db": "docker-compose up",
+    "dev:ts-node": "wait-on tcp:5432 --interval 1000 && prisma generate && nodemon index.ts"
+  }
+}
