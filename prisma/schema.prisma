@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  login     String   @unique
+  firstName String
+  lastName  String
+  status    Status   @default(ACTIVE)
+  role      Role     @default(USER)
+  password  String
+  visits    Visit[]   @relation(name: "UserVisits")
+  scheduledVisits Visit[] @relation(name: "UserScheduledVisits")
+}
+
+model Token {
+  id       Int    @id @default(autoincrement())
+  token    String @unique
+  expireAt String
+  userId   Int
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  ACTIVE
+  BLOCKED
+}
+
+model Customer {
+  id                      Int      @id @default(autoincrement())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  firstName               String
+  lastName                String
+  gender                  Gender @default(FEMALE)
+  birthday                DateTime
+  email                   String?
+  phone                   String?
+  points                  Int      @default(0)
+  source                  String?
+  photoUrl                String?
+  instagram               String?
+  facebook                String?
+  notes                   String?
+  marketingPermission     Boolean  @default(true)
+  healthContraindications String?
+  visits                  Visit[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model Service {
+  id       Int       @id @default(autoincrement())
+  title    String
+  duration DateTime?
+  price    Int
+  priority Priority  @default(MEDIUM)
+  visit    Visit[]
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Visit {
+  id          Int         @id @default(autoincrement())
+  customer    Customer    @relation(references: [id], fields: [customerId])
+  service     Service     @relation(references: [id], fields: [serviceId])
+  scheduledBy User        @relation(name: "UserScheduledVisits", references: [id], fields: [userId], map: "ScheduledVisit_userId")
+  executor    User        @relation(name: "UserVisits", references: [id], fields: [userId], map: "Visit_userId")
+  data        DateTime
+  status      VisitStatus @default(BEFORE_APPLICATION)
+  notes       String?
+  customerId  Int @unique
+  serviceId  Int @unique
+  userId  Int @unique
+}
+
+enum VisitStatus {
+  DONE
+  CANCELLED
+  BEFORE_APPLICATION
+}
