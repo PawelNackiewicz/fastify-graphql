@@ -1,8 +1,21 @@
-import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify'
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify'
 import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from './server';
 import { typeDefs, resolvers } from '../graphql/graphql'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
+import { PrismaClient } from "@prisma/client";
+import { ReadableUser } from './auth/types';
+import { getUser } from './auth/auth';
+import type { FastifyCookieOptions } from '@fastify/cookie'
+import cookie from '@fastify/cookie'
+
+const prisma = new PrismaClient()
+export interface Context {
+  prisma: PrismaClient,
+  user: ReadableUser | null,
+  request: FastifyRequest,
+  reply: FastifyReply
+}
 
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
   return {
@@ -18,6 +31,10 @@ function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
 
 async function startApolloServer() {
   const app = Fastify();
+  app.register(cookie, {
+    secret: "my-secret", // for cookies signature
+    parseOptions: {}     // options for parsing cookies
+  } as FastifyCookieOptions)
   const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -28,6 +45,11 @@ async function startApolloServer() {
       ApolloServerPluginDrainHttpServer({ httpServer: app.server }),
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
+    context: async({request, reply}): Promise<Context> => {
+      const token = request.headers.cookie?.replace('token=', '') || '';
+      const user = await getUser(token, prisma)
+      return {prisma, user, request, reply}
+  },
   });
 
   try {
