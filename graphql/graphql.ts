@@ -1,13 +1,15 @@
 import { Context } from "../src";
-import { authenticated, signUser } from "../src/auth/auth";
+import { authenticated, signUser } from "../src/auth/authService";
 const { gql } = require("apollo-server");
 import * as bcrypt from "bcrypt";
+import { createUser } from "../src/user/userService";
+import { CreateUserInput } from "../src/user/types";
 
 export const typeDefs = gql`
   scalar Date
   type User {
     id: ID!
-    email: String!
+    login: String!
     firstName: String!
     lastName: String!
     password: String!
@@ -62,24 +64,24 @@ export const typeDefs = gql`
 
   type Mutation {
     login(input: SigninInput): AuthUser
-    createService(input: CreateServiceInput): Service
+    createUser(input: CreateUserInput): User
   }
 
   input SigninInput {
-    email: String!
+    login: String!
     password: String!
   }
 
-  input CreateServiceInput {
-    title: String!
-    duration: Date
-    price: Int
-    priority: String
+  input CreateUserInput {
+    login: String!
+    firstName: String!
+    lastName: String!
+    password: String!
   }
 
   type AuthUser {
     id: ID!
-    email: String!
+    login: String!
     firstName: String!
     lastName: String!
     status: String!
@@ -95,13 +97,12 @@ interface loginInputs {
 export const resolvers = {
   Query: {
     me: authenticated(async (root: unknown, args: unknown, context: Context, info: unknown) => {
-      return context.user;
+      console.log(context);
+      return context.user
     }),
   },
   Mutation: {
     async login(root: unknown, { input }: {input: loginInputs}, { prisma, reply }: Context) {
-      console.log(input);
-      
       const foundUser = await prisma.user.findUnique({
         where: { login: input.login },
       });
@@ -118,7 +119,15 @@ export const resolvers = {
         });
         return foundUser;
       }
+      reply.cookie("token", '');
       throw new Error("Invalid credentials");
+    },
+    async createUser(root: unknown, { input }: {input: CreateUserInput}, { prisma }: Context) {
+      try {
+        return await createUser(input, 'USER', prisma)
+      } catch(e) {
+        console.error(e);
+      }
     },
   },
 };
