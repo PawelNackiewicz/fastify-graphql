@@ -25,9 +25,7 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail 'yarn dev:db' 'yarn dev:ts-node'",
-    "dev:db": "docker-compose up",
-    "dev:ts-node": "wait-on tcp:5432 --interval 1000 && prisma generate && nodemon index.ts",
-    "dev:server": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "dev:db": "docker-compose up"
   }
 }

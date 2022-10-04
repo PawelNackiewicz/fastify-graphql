@@ -4,6 +4,7 @@ const { gql } = require("apollo-server");
 import * as bcrypt from "bcrypt";
 import { createUser } from "../src/user/userService";
 import { CreateUserInput } from "../src/user/types";
+import { createProduct, updateProduct } from "../src/product/productService";
 
 export const typeDefs = gql`
   scalar Date
@@ -65,6 +66,17 @@ export const typeDefs = gql`
   type Mutation {
     login(input: SigninInput): AuthUser
     createUser(input: CreateUserInput): User
+    createProduct(input: CreateProductInput): Service
+    updateProduct(id: ID!, input: CreateProductInput): Service
+  }
+
+  type AuthUser {
+    id: ID!
+    login: String!
+    firstName: String!
+    lastName: String!
+    status: String!
+    role: String!
   }
 
   input SigninInput {
@@ -79,19 +91,24 @@ export const typeDefs = gql`
     password: String!
   }
 
-  type AuthUser {
-    id: ID!
-    login: String!
-    firstName: String!
-    lastName: String!
-    status: String!
-    role: String!
+  input CreateProductInput {
+    title: String
+    duration: String
+    priority: String
+    price: Int
   }
 `;
 
 interface loginInputs {
   login: string,
   password: string
+}
+
+export interface CreateProductInput {
+  title: string
+  duration: string
+  priority: 'LOW' | 'MEDIUM' | 'HIGH'
+  price: number
 }
 
 export const resolvers = {
@@ -129,5 +146,19 @@ export const resolvers = {
         console.error(e);
       }
     },
+    async createProduct(root: unknown, { input }: {input: CreateProductInput}, context: Context) {
+      try {
+        return await createProduct(input, context.user, context.prisma)
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async updateProduct(root: unknown, { id, input }: {id: string, input: CreateProductInput}, context: Context) {
+      try {
+        return await updateProduct(parseInt(id), input, context.user, context.prisma)
+      } catch (e) {
+        console.error(e)
+      }
+    }
   },
 };
