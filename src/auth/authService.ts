@@ -1,6 +1,6 @@
 import { AuthenticationError } from "apollo-server";
 import { PrismaClient, Role, User } from "@prisma/client";
-import { Context } from "../index";
+import { Context } from "../app";
 import { create, generateToken, tokenActinve } from "./tokenService";
 import { getReadableUser } from "../user/userService";
 

@@ -1,5 +1,5 @@
 import { AuthenticationError } from "apollo-server";
-import { Context } from "..";
+import { Context } from "../app";
 import { CreateProductInput } from "../../graphql/graphql";
 
 export async function createProduct(createProductDTO: CreateProductInput, user: Context['user'], prisma: Context['prisma']) {
