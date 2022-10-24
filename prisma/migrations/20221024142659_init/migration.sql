@@ -62,14 +62,15 @@ CREATE TABLE "Customer" (
 );
 
 -- CreateTable
-CREATE TABLE "Service" (
+CREATE TABLE "Product" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
+    "description" TEXT,
     "duration" TIMESTAMP(3),
-    "price" INTEGER NOT NULL,
+    "price" MONEY NOT NULL,
     "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
 
-    CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -79,7 +80,7 @@ CREATE TABLE "Visit" (
     "status" "VisitStatus" NOT NULL DEFAULT 'BEFORE_APPLICATION',
     "notes" TEXT,
     "customerId" INTEGER NOT NULL,
-    "serviceId" INTEGER NOT NULL,
+    "productId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Visit_pkey" PRIMARY KEY ("id")
@@ -95,7 +96,7 @@ CREATE UNIQUE INDEX "Token_token_key" ON "Token"("token");
 CREATE UNIQUE INDEX "Visit_customerId_key" ON "Visit"("customerId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Visit_serviceId_key" ON "Visit"("serviceId");
+CREATE UNIQUE INDEX "Visit_productId_key" ON "Visit"("productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Visit_userId_key" ON "Visit"("userId");
@@ -104,7 +105,7 @@ CREATE UNIQUE INDEX "Visit_userId_key" ON "Visit"("userId");
 ALTER TABLE "Visit" ADD CONSTRAINT "Visit_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Visit" ADD CONSTRAINT "Visit_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Visit" ADD CONSTRAINT "Visit_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Visit" ADD CONSTRAINT "ScheduledVisit_userId" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -8,17 +8,17 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  login     String   @unique
-  firstName String
-  lastName  String
-  status    Status   @default(ACTIVE)
-  role      Role     @default(USER)
-  password  String
-  visits    Visit[]   @relation(name: "UserVisits")
-  scheduledVisits Visit[] @relation(name: "UserScheduledVisits")
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  login           String   @unique
+  firstName       String
+  lastName        String
+  status          Status   @default(ACTIVE)
+  role            Role     @default(USER)
+  password        String
+  visits          Visit[]  @relation(name: "UserVisits")
+  scheduledVisits Visit[]  @relation(name: "UserScheduledVisits")
 }
 
 model Token {
@@ -44,7 +44,7 @@ model Customer {
   updatedAt               DateTime @updatedAt
   firstName               String
   lastName                String
-  gender                  Gender @default(FEMALE)
+  gender                  Gender   @default(FEMALE)
   birthday                DateTime
   email                   String?
   phone                   String?
@@ -64,13 +64,14 @@ enum Gender {
   FEMALE
 }
 
-model Service {
-  id       Int       @id @default(autoincrement())
-  title    String
-  duration DateTime?
-  price    Int
-  priority Priority  @default(MEDIUM)
-  visit    Visit[]
+model Product {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  duration    DateTime?
+  price       Decimal   @db.Money
+  priority    Priority  @default(MEDIUM)
+  visit       Visit[]
 }
 
 enum Priority {
@@ -82,15 +83,15 @@ enum Priority {
 model Visit {
   id          Int         @id @default(autoincrement())
   customer    Customer    @relation(references: [id], fields: [customerId])
-  service     Service     @relation(references: [id], fields: [serviceId])
+  product     Product     @relation(references: [id], fields: [productId])
   scheduledBy User        @relation(name: "UserScheduledVisits", references: [id], fields: [userId], map: "ScheduledVisit_userId")
   executor    User        @relation(name: "UserVisits", references: [id], fields: [userId], map: "Visit_userId")
   data        DateTime
   status      VisitStatus @default(BEFORE_APPLICATION)
   notes       String?
-  customerId  Int @unique
-  serviceId  Int @unique
-  userId  Int @unique
+  customerId  Int         @unique
+  productId   Int         @unique
+  userId      Int         @unique
 }
 
 enum VisitStatus {
