@@ -1,13 +1,13 @@
 import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
-import { ApolloServer } from './server';
-import { typeDefs, resolvers } from '../graphql/graphql'
+import { ApolloServer } from './src/server';
+import { typeDefs, resolvers } from './graphql/graphql'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import { PrismaClient } from "@prisma/client";
 import type { FastifyCookieOptions } from '@fastify/cookie'
 import cookie from '@fastify/cookie'
-import { ReadableUser } from './user/types';
-import { getUser } from './auth/authService';
+import { ReadableUser } from './src/user/types';
+import { getUser } from './src/auth/authService';
 
 const prisma = new PrismaClient()
 export interface Context {

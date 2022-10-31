@@ -1,4 +1,4 @@
-import { Context } from "../src/app";
+import { Context } from "../app";
 import { authenticated, signUser } from "../src/auth/authService";
 const { gql } = require("apollo-server");
 import * as bcrypt from "bcrypt";
